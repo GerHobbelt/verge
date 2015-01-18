@@ -57,7 +57,10 @@
    * @return {{width:number, height:number}}
    */
   function viewport() {
-    return {'width':viewportW(), 'height':viewportH()};
+    return {
+      width: viewportW(), 
+      height: viewportH()
+    };
   }
   xports.viewport = viewport;
   

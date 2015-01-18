@@ -1,5 +1,5 @@
 /*!
- * verge 1.9.1+201407112206
+ * verge 1.9.1+201501181640
  * https://github.com/ryanve/verge
  * MIT License 2013 Ryan Van Etten
  */
