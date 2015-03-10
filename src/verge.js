@@ -24,8 +24,14 @@
         return false;
       }
     , viewportW = xports.viewportW = function() {
-        var a = docElem.clientWidth, b = win.innerWidth;
-        return a < b ? b : a;
+        // Including presence of user-agent scrollbar, if available
+        document.body.style.overflow = 'hidden';
+        var w = document.body.clientWidth;
+        document.body.style.overflow = 'scroll';
+        w -= document.body.clientWidth;
+        if(!w) w = document.body.offsetWidth - document.body.clientWidth;
+        document.body.style.overflow = '';
+        return w;
       }
     , viewportH = xports.viewportH = function() {
         var a = docElem.clientHeight, b = win.innerHeight;
