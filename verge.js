@@ -18,40 +18,44 @@
         root.verge = factory();
     }
 }(this, function () {
+  'use strict';
 
-  var xports = {}
-    , win = typeof window != 'undefined' && window
-    , doc = typeof document != 'undefined' && document
-    , docElem = doc && doc.documentElement
-    , matchMedia = win.matchMedia || win.msMatchMedia
-    , mq = matchMedia ? function(q) {
-        return !!matchMedia.call(win, q).matches;
-      } : function() {
-        return false;
-      }
-    , viewportW = xports.viewportW = function() {
-        var a = docElem.clientWidth, b = win.innerWidth;
-        return a < b ? b : a;
-      }
-    , viewportH = xports.viewportH = function() {
-        var a = docElem.clientHeight, b = win.innerHeight;
-        return a < b ? b : a;
-      };
-  
+  var xports = {},
+      win = typeof window != 'undefined' && window,
+      doc = typeof document != 'undefined' && document,
+      docElem = doc && doc.documentElement,
+      matchMedia = win.matchMedia || win.msMatchMedia;
+      
   /** 
    * Test if a media query is active. Like Modernizr.mq
    * @since 1.6.0
    * @return {boolean}
    */  
-  xports.mq = mq;
+  xports.mq = matchMedia ? function(q) {
+    return !!matchMedia.call(win, q).matches;
+  } : function() {
+    return false;
+  };
 
+  xports.viewportW = function() {
+    var a = docElem.clientWidth, 
+        b = win.innerWidth;
+    return a < b ? b : a;
+  };
+  
+  xports.viewportH = function() {
+    var a = docElem.clientHeight, 
+        b = win.innerHeight;
+    return a < b ? b : a;
+  };
+  
   /** 
    * Normalized matchMedia
    * @since 1.6.0
    * @return {MediaQueryList|Object}
    */ 
   xports.matchMedia = matchMedia ? function() {
-    // matchMedia must be binded to window
+    // matchMedia must be bound to window
     return matchMedia.apply(win, arguments);
   } : function() {
     // Gracefully degrade to plain object
@@ -62,13 +66,12 @@
    * @since 1.8.0
    * @return {{width:number, height:number}}
    */
-  function viewport() {
+  xports.viewport = function () {
     return {
-      width: viewportW(), 
-      height: viewportH()
+      width: xports.viewportW(), 
+      height: xports.viewportH()
     };
-  }
-  xports.viewport = viewport;
+  };
   
   /** 
    * Cross-browser window.scrollX
@@ -96,8 +99,14 @@
   function calibrate(coords, cushion) {
     var o = {};
     cushion = +cushion || 0;
-    o.width = (o.right = coords.right + cushion) - (o.left = coords.left - cushion);
-    o.height = (o.bottom = coords.bottom + cushion) - (o.top = coords.top - cushion);
+    
+    o.right = coords.right + cushion;
+    o.left = coords.left - cushion;
+    o.width = o.right - o.left;
+    o.bottom = coords.bottom + cushion;
+    o.top = coords.top - cushion;
+    o.height = o.bottom - o.top;
+
     return o;
   }
 
@@ -109,12 +118,11 @@
    * @param {number=} cushion +/- pixel adjustment amount
    * @return {Object|boolean}
    */
-  function rectangle(el, cushion) {
+  xports.rectangle = function(el, cushion) {
     el = el && !el.nodeType ? el[0] : el;
-    if (!el || 1 !== el.nodeType) return false;
+    if (!el || 1 !== el.nodeType) { return false; }
     return calibrate(el.getBoundingClientRect(), cushion);
   }
-  xports.rectangle = rectangle;
 
   /**
    * Get the viewport aspect ratio (or the aspect ratio of an object or element)
@@ -123,14 +131,15 @@
    * @return {number}
    * @link http://w3.org/TR/css3-mediaqueries/#orientation
    */
-  function aspect(o) {
-    o = null == o ? viewport() : 1 === o.nodeType ? rectangle(o) : o;
-    var h = o.height, w = o.width;
+  xports.aspect = function (o) {
+    o = null == o ? xports.viewport() : 1 === o.nodeType ? xports.rectangle(o) : o;
+    var h = o.height, 
+        w = o.width;
+
     h = typeof h == 'function' ? h.call(o) : h;
     w = typeof w == 'function' ? w.call(o) : w;
     return w/h;
   }
-  xports.aspect = aspect;
 
   /**
    * Test if an element is in the same x-axis section as the viewport.
@@ -140,8 +149,8 @@
    * @return {boolean}
    */
   xports.inX = function(el, cushion) {
-    var r = rectangle(el, cushion);
-    return !!r && r.right >= 0 && r.left <= viewportW();
+    var r = xports.rectangle(el, cushion);
+    return !!r && r.right >= 0 && r.left <= xports.viewportW();
   };
 
   /**
@@ -152,8 +161,8 @@
    * @return {boolean}
    */
   xports.inY = function(el, cushion) {
-    var r = rectangle(el, cushion);
-    return !!r && r.bottom >= 0 && r.top <= viewportH();
+    var r = xports.rectangle(el, cushion);
+    return !!r && r.bottom >= 0 && r.top <= xports.viewportH();
   };
 
   /**
@@ -166,8 +175,8 @@
   xports.inViewport = function(el, cushion) {
     // Equiv to `inX(el, cushion) && inY(el, cushion)` but just manually do both 
     // to avoid calling rectangle() twice. It gzips just as small like this.
-    var r = rectangle(el, cushion);
-    return !!r && r.bottom >= 0 && r.right >= 0 && r.top <= viewportH() && r.left <= viewportW();
+    var r = xports.rectangle(el, cushion);
+    return !!r && r.bottom >= 0 && r.right >= 0 && r.top <= xports.viewportH() && r.left <= xports.viewportW();
   };
 
   return xports;
