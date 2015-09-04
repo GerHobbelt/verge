@@ -1,5 +1,5 @@
 /*!
- * verge 1.9.1+201501181640
+ * verge 1.9.1+201509041315
  * https://github.com/ryanve/verge
  * MIT License 2013 Ryan Van Etten
  */
@@ -122,7 +122,7 @@
     el = el && !el.nodeType ? el[0] : el;
     if (!el || 1 !== el.nodeType) { return false; }
     return calibrate(el.getBoundingClientRect(), cushion);
-  }
+  };
 
   /**
    * Get the viewport aspect ratio (or the aspect ratio of an object or element)
@@ -132,14 +132,14 @@
    * @link http://w3.org/TR/css3-mediaqueries/#orientation
    */
   xports.aspect = function (o) {
-    o = null == o ? xports.viewport() : 1 === o.nodeType ? xports.rectangle(o) : o;
+    o = null == o ? xports.viewport() : 1 === o.nodeType ? xports.rectangle(o) : o;         // jshint ignore:line
     var h = o.height, 
         w = o.width;
 
     h = typeof h == 'function' ? h.call(o) : h;
     w = typeof w == 'function' ? w.call(o) : w;
     return w/h;
-  }
+  };
 
   /**
    * Test if an element is in the same x-axis section as the viewport.
@@ -181,4 +181,3 @@
 
   return xports;
 }));
-
