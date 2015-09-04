@@ -31,9 +31,27 @@
     return false;
   };
 
+  /** 
+   * Account for potential presence of user-agent scrollbar: return the scrollbar width.
+   * @since 1.9.2
+   * @return {number}
+   */  
+  xports.scrollbarW = function() {
+    // Including presence of user-agent scrollbar, if available
+    document.body.style.overflow = 'hidden';
+    var w = document.body.clientWidth;
+    document.body.style.overflow = 'scroll';
+    w -= document.body.clientWidth;
+    if (!w) {
+      w = document.body.offsetWidth - document.body.clientWidth;
+    }
+    document.body.style.overflow = '';
+    return w;
+  };
+  
   xports.viewportW = function() {
     var a = docElem.clientWidth, 
-        b = win.innerWidth;
+        b = win.innerWidth + xports.scrollbarW();
     return a < b ? b : a;
   };
   
